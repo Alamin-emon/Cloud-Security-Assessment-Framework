@@ -1,0 +1,19 @@
+﻿Misconfiguration,Prowler Detected,Prowler Severity,ZeusCloud Detected,ZeusCloud Severity,Manually Confirmed
+S3 public-read ACL,YES,Critical,YES,Critical,YES
+S3 block public access off,YES,Critical,NO,—,YES
+S3 no server-side encryption,YES,Medium,NO,—,YES
+S3 versioning disabled,YES,Low,NO,—,YES
+IAM AdministratorAccess user,YES,High,YES,Critical,YES
+IAM user no MFA,YES,High,YES,Critical,YES
+IAM weak password policy,YES,Medium,NO,—,YES
+IAM policy direct on user,YES,Low,NO,—,YES
+EC2 open SSH 0.0.0.0/0,YES,High,YES,Critical,YES
+EC2 all TCP open 0.0.0.0/0,YES,Critical,YES,Critical,YES
+EC2 IMDSv2 not enforced,YES,Medium,YES,High,YES
+EC2 EBS not encrypted,YES,Medium,NO,—,YES
+EC2 public IP assigned,YES,Medium,YES,—,YES
+CloudTrail disabled,YES,High,YES,High,YES
+CloudTrail log validation,YES,Low,NO,—,YES
+GuardDuty not enabled,YES,High,NO,—,YES
+SSRF -> IMDSv1 attack path,NO,—,YES,High,YES
+Full exfil chain (5 hops),NO,—,YES,Critical,YES

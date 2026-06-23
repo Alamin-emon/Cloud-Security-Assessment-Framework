@@ -1,0 +1,45 @@
+{
+  "prowler": {
+    "total_findings": 16,
+    "severity_distribution": {
+      "Critical": 3,
+      "Low": 3,
+      "Medium": 5,
+      "High": 5
+    },
+    "services_affected": {
+      "s3": 4,
+      "iam": 4,
+      "ec2": 5,
+      "cloudtrail": 2,
+      "guardduty": 1
+    },
+    "unique_services": 5,
+    "compliance_refs": 26
+  },
+  "zeuscloud": {
+    "total_findings": 5,
+    "attack_paths": 4,
+    "standalone_findings": 1,
+    "severity_distribution": {
+      "Critical": 3,
+      "High": 2
+    },
+    "max_path_depth": 5,
+    "avg_path_depth": 3.5,
+    "unique_resources": 6
+  },
+  "validation": {
+    "prowler": {
+      "true_positives": 15,
+      "false_positives": 2,
+      "false_negatives": 1
+    },
+    "zeuscloud": {
+      "true_positives": 4,
+      "false_positives": 1,
+      "false_negatives": 2
+    }
+  },
+  "unified_table_rows": 18
+}

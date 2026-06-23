@@ -1,0 +1,301 @@
+[
+  {
+    "CheckID": "s3_bucket_public_access_block_account_enabled",
+    "CheckTitle": "S3 Account-Level Public Access Block Not Enabled",
+    "ServiceName": "s3",
+    "Status": "FAIL",
+    "Severity": "Critical",
+    "Region": "eu-west-1",
+    "ResourceArn": "arn:aws:s3:::ict-lab-a3f2c1d4-data",
+    "ResourceId": "ict-lab-a3f2c1d4-data",
+    "Description": "The S3 bucket does not have public access block settings enabled at the account level.",
+    "Risk": "Anyone on the internet can read objects from this bucket.",
+    "Remediation": "Enable S3 Block Public Access at account level and per-bucket.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 2.1.5",
+      "AWS-Foundational-Security-Best-Practices S3.1"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366315Z"
+  },
+  {
+    "CheckID": "s3_bucket_acl_public_access",
+    "CheckTitle": "S3 Bucket ACL Allows Public Read Access",
+    "ServiceName": "s3",
+    "Status": "FAIL",
+    "Severity": "Critical",
+    "Region": "eu-west-1",
+    "ResourceArn": "arn:aws:s3:::ict-lab-a3f2c1d4-data",
+    "ResourceId": "ict-lab-a3f2c1d4-data",
+    "Description": "S3 bucket ACL is set to 'public-read', exposing all objects to unauthenticated users.",
+    "Risk": "Sensitive data including db_config.txt containing credentials is publicly accessible.",
+    "Remediation": "Change the bucket ACL to private and use bucket policies for controlled access.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 2.1.1",
+      "PCI-DSS v3.2.1 1.3"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366362Z"
+  },
+  {
+    "CheckID": "s3_bucket_versioning_enabled",
+    "CheckTitle": "S3 Bucket Versioning Not Enabled",
+    "ServiceName": "s3",
+    "Status": "FAIL",
+    "Severity": "Low",
+    "Region": "eu-west-1",
+    "ResourceArn": "arn:aws:s3:::ict-lab-a3f2c1d4-data",
+    "ResourceId": "ict-lab-a3f2c1d4-data",
+    "Description": "Bucket versioning is disabled. Accidental deletions or overwrites cannot be recovered.",
+    "Risk": "Data loss from accidental or malicious deletion cannot be reversed.",
+    "Remediation": "Enable versioning on the S3 bucket.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 2.1.3"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366382Z"
+  },
+  {
+    "CheckID": "s3_bucket_default_encryption",
+    "CheckTitle": "S3 Bucket Server-Side Encryption Not Enabled",
+    "ServiceName": "s3",
+    "Status": "FAIL",
+    "Severity": "Medium",
+    "Region": "eu-west-1",
+    "ResourceArn": "arn:aws:s3:::ict-lab-a3f2c1d4-data",
+    "ResourceId": "ict-lab-a3f2c1d4-data",
+    "Description": "Default server-side encryption (SSE) is not configured for this S3 bucket.",
+    "Risk": "Data at rest is stored in plaintext and could be exposed if physically compromised.",
+    "Remediation": "Enable SSE-S3 or SSE-KMS as the default encryption for the bucket.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 2.1.1",
+      "ISO27001 A.10.1.1"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366392Z"
+  },
+  {
+    "CheckID": "iam_user_with_administrator_access",
+    "CheckTitle": "IAM User Has AdministratorAccess Policy",
+    "ServiceName": "iam",
+    "Status": "FAIL",
+    "Severity": "High",
+    "Region": "global",
+    "ResourceArn": "arn:aws:iam::123456789012:user/ict-lab-a3f2c1d4-admin",
+    "ResourceId": "ict-lab-a3f2c1d4-admin",
+    "Description": "IAM user 'ict-lab-a3f2c1d4-admin' has AdministratorAccess managed policy attached.",
+    "Risk": "Compromise of this account grants full control over the AWS environment.",
+    "Remediation": "Apply least privilege. Restrict permissions to only those required for the user's role.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 1.16",
+      "SOC2 CC6.3"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366402Z"
+  },
+  {
+    "CheckID": "iam_user_mfa_enabled_console_access",
+    "CheckTitle": "IAM User Console Access Without MFA",
+    "ServiceName": "iam",
+    "Status": "FAIL",
+    "Severity": "High",
+    "Region": "global",
+    "ResourceArn": "arn:aws:iam::123456789012:user/ict-lab-a3f2c1d4-admin",
+    "ResourceId": "ict-lab-a3f2c1d4-admin",
+    "Description": "IAM user with console access does not have MFA enabled.",
+    "Risk": "Account takeover via credential stuffing or phishing without MFA protection.",
+    "Remediation": "Enable MFA for all IAM users with console access, especially privileged accounts.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 1.10",
+      "PCI-DSS v3.2.1 8.3"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366409Z"
+  },
+  {
+    "CheckID": "iam_password_policy_minimum_length_14",
+    "CheckTitle": "IAM Account Password Policy Minimum Length < 14",
+    "ServiceName": "iam",
+    "Status": "FAIL",
+    "Severity": "Medium",
+    "Region": "global",
+    "ResourceArn": "arn:aws:iam::123456789012:root",
+    "ResourceId": "123456789012",
+    "Description": "The IAM account password policy does not require a minimum length of 14 characters.",
+    "Risk": "Weak passwords increase susceptibility to brute-force attacks.",
+    "Remediation": "Set minimum password length to 14 or more in the IAM account password policy.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 1.8",
+      "ISO27001 A.9.4.3"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366415Z"
+  },
+  {
+    "CheckID": "iam_policy_attached_only_to_groups_or_roles",
+    "CheckTitle": "IAM Policy Directly Attached to User",
+    "ServiceName": "iam",
+    "Status": "FAIL",
+    "Severity": "Low",
+    "Region": "global",
+    "ResourceArn": "arn:aws:iam::123456789012:user/ict-lab-a3f2c1d4-dev",
+    "ResourceId": "ict-lab-a3f2c1d4-dev",
+    "Description": "An IAM policy (s3:* on all resources) is directly attached to a user instead of a group/role.",
+    "Risk": "Difficult to audit and manage; over-broad permissions granted directly to user.",
+    "Remediation": "Attach policies to IAM groups or roles; remove direct user policy attachments.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 1.15"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366422Z"
+  },
+  {
+    "CheckID": "iam_root_account_no_access_keys",
+    "CheckTitle": "Root Account Has Active Access Keys",
+    "ServiceName": "iam",
+    "Status": "PASS",
+    "Severity": "Critical",
+    "Region": "global",
+    "ResourceArn": "arn:aws:iam::123456789012:root",
+    "ResourceId": "root",
+    "Description": "Root account does not have active access keys. PASS.",
+    "Risk": "N/A",
+    "Remediation": "N/A",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 1.4"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366428Z"
+  },
+  {
+    "CheckID": "ec2_securitygroup_allow_ingress_from_internet_to_ssh_port_22",
+    "CheckTitle": "Security Group Allows SSH Ingress from 0.0.0.0/0",
+    "ServiceName": "ec2",
+    "Status": "FAIL",
+    "Severity": "High",
+    "Region": "eu-west-1",
+    "ResourceArn": "arn:aws:ec2:eu-west-1:123456789012:security-group/sg-0abc123",
+    "ResourceId": "sg-0abc123",
+    "Description": "Security group 'ict-lab-open-sg' allows unrestricted SSH (port 22) from 0.0.0.0/0.",
+    "Risk": "Exposes EC2 instances to brute-force attacks and unauthorised SSH access from the internet.",
+    "Remediation": "Restrict SSH access to known IP ranges or use AWS Systems Manager Session Manager.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 5.2",
+      "PCI-DSS v3.2.1 1.3.1"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366435Z"
+  },
+  {
+    "CheckID": "ec2_securitygroup_allow_ingress_from_internet_to_all_ports",
+    "CheckTitle": "Security Group Allows All TCP Ingress from 0.0.0.0/0",
+    "ServiceName": "ec2",
+    "Status": "FAIL",
+    "Severity": "Critical",
+    "Region": "eu-west-1",
+    "ResourceArn": "arn:aws:ec2:eu-west-1:123456789012:security-group/sg-0abc123",
+    "ResourceId": "sg-0abc123",
+    "Description": "Security group allows all TCP ports (0-65535) from 0.0.0.0/0.",
+    "Risk": "Any service running on the instance is exposed to the entire internet.",
+    "Remediation": "Remove the all-TCP ingress rule. Define explicit rules only for required ports.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 5.1"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366446Z"
+  },
+  {
+    "CheckID": "ec2_instance_imdsv2_enabled",
+    "CheckTitle": "EC2 Instance Metadata Service v2 Not Enforced",
+    "ServiceName": "ec2",
+    "Status": "FAIL",
+    "Severity": "Medium",
+    "Region": "eu-west-1",
+    "ResourceArn": "arn:aws:ec2:eu-west-1:123456789012:instance/i-0abc123def456789",
+    "ResourceId": "i-0abc123def456789",
+    "Description": "EC2 instance allows IMDSv1 (http_tokens=optional). IMDSv1 is vulnerable to SSRF attacks.",
+    "Risk": "SSRF vulnerability in application code can leak IAM role credentials via IMDSv1.",
+    "Remediation": "Set http_tokens=required to enforce IMDSv2.",
+    "Compliance": [
+      "AWS-Foundational-Security-Best-Practices EC2.8"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366453Z"
+  },
+  {
+    "CheckID": "ec2_ebs_volume_encryption",
+    "CheckTitle": "EBS Root Volume Not Encrypted",
+    "ServiceName": "ec2",
+    "Status": "FAIL",
+    "Severity": "Medium",
+    "Region": "eu-west-1",
+    "ResourceArn": "arn:aws:ec2:eu-west-1:123456789012:volume/vol-0abc123",
+    "ResourceId": "vol-0abc123",
+    "Description": "The root EBS volume of EC2 instance is not encrypted at rest.",
+    "Risk": "Data on the EBS volume is stored in plaintext. Physical compromise exposes data.",
+    "Remediation": "Enable EBS volume encryption. Use AWS KMS for key management.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 2.2.1"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366460Z"
+  },
+  {
+    "CheckID": "ec2_instance_public_ip",
+    "CheckTitle": "EC2 Instance Has Public IP Address Assigned",
+    "ServiceName": "ec2",
+    "Status": "FAIL",
+    "Severity": "Medium",
+    "Region": "eu-west-1",
+    "ResourceArn": "arn:aws:ec2:eu-west-1:123456789012:instance/i-0abc123def456789",
+    "ResourceId": "i-0abc123def456789",
+    "Description": "EC2 instance has public IP 54.74.123.45 assigned and is directly reachable from the internet.",
+    "Risk": "Direct internet exposure increases attack surface.",
+    "Remediation": "Use NAT Gateway + private subnets. Access via bastion or SSM Session Manager.",
+    "Compliance": [
+      "AWS-Foundational-Security-Best-Practices EC2.9"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366467Z"
+  },
+  {
+    "CheckID": "cloudtrail_enabled",
+    "CheckTitle": "CloudTrail Not Enabled in All Regions",
+    "ServiceName": "cloudtrail",
+    "Status": "FAIL",
+    "Severity": "High",
+    "Region": "global",
+    "ResourceArn": "arn:aws:cloudtrail:eu-west-1:123456789012:trail",
+    "ResourceId": "123456789012",
+    "Description": "No CloudTrail trails are configured. AWS API calls are not being logged.",
+    "Risk": "Without CloudTrail, security incidents cannot be investigated. Attacker activity leaves no trace.",
+    "Remediation": "Enable CloudTrail with multi-region support and log file validation.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 3.1",
+      "SOC2 CC7.2",
+      "PCI-DSS v3.2.1 10.1"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366475Z"
+  },
+  {
+    "CheckID": "cloudtrail_log_file_validation_enabled",
+    "CheckTitle": "CloudTrail Log File Validation Not Enabled",
+    "ServiceName": "cloudtrail",
+    "Status": "FAIL",
+    "Severity": "Low",
+    "Region": "global",
+    "ResourceArn": "arn:aws:cloudtrail:eu-west-1:123456789012:trail",
+    "ResourceId": "123456789012",
+    "Description": "CloudTrail does not have log file integrity validation enabled.",
+    "Risk": "Log files could be tampered with after the fact without detection.",
+    "Remediation": "Enable log file validation when creating or updating CloudTrail.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 3.2"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366481Z"
+  },
+  {
+    "CheckID": "guardduty_is_enabled",
+    "CheckTitle": "Amazon GuardDuty Not Enabled",
+    "ServiceName": "guardduty",
+    "Status": "FAIL",
+    "Severity": "High",
+    "Region": "eu-west-1",
+    "ResourceArn": "arn:aws:guardduty:eu-west-1:123456789012:detector",
+    "ResourceId": "123456789012",
+    "Description": "Amazon GuardDuty is not enabled in this region.",
+    "Risk": "Threat detection for malicious activity (port scans, crypto mining, exfiltration) is absent.",
+    "Remediation": "Enable GuardDuty in all active regions.",
+    "Compliance": [
+      "CIS-AWS-Foundations-Benchmark v1.5.0 2.7",
+      "AWS-Foundational-Security-Best-Practices GuardDuty.1"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366488Z"
+  }
+]

@@ -1,0 +1,245 @@
+[
+  {
+    "FindingID": "ZC-ATK-001",
+    "Title": "Full Internet-to-Data Exfiltration Path",
+    "Type": "AttackPath",
+    "Severity": "Critical",
+    "RiskScore": 9.8,
+    "PathDepth": 5,
+    "Nodes": [
+      {
+        "id": "internet",
+        "type": "ExternalActor",
+        "label": "Internet (0.0.0.0/0)"
+      },
+      {
+        "id": "sg-0abc123",
+        "type": "SecurityGroup",
+        "label": "Open SG (SSH+ALL TCP)"
+      },
+      {
+        "id": "i-0abc123def456789",
+        "type": "EC2Instance",
+        "label": "EC2 54.74.123.45 (public)"
+      },
+      {
+        "id": "ec2-role",
+        "type": "IAMRole",
+        "label": "ec2-role (s3:* on *)"
+      },
+      {
+        "id": "ict-lab-a3f2c1d4-data",
+        "type": "S3Bucket",
+        "label": "s3://ict-lab-a3f2c1d4-data (public-read)"
+      },
+      {
+        "id": "credentials",
+        "type": "S3Object",
+        "label": "credentials/db_config.txt"
+      }
+    ],
+    "Edges": [
+      {
+        "from": "internet",
+        "to": "sg-0abc123",
+        "label": "allowed by SG ingress 0.0.0.0/0:22"
+      },
+      {
+        "from": "sg-0abc123",
+        "to": "i-0abc123def456789",
+        "label": "SSH access to instance"
+      },
+      {
+        "from": "i-0abc123def456789",
+        "to": "ec2-role",
+        "label": "assumes IAM role via instance profile"
+      },
+      {
+        "from": "ec2-role",
+        "to": "ict-lab-a3f2c1d4-data",
+        "label": "s3:* permission on all buckets"
+      },
+      {
+        "from": "ict-lab-a3f2c1d4-data",
+        "to": "credentials",
+        "label": "GetObject \u2014 publicly readable"
+      }
+    ],
+    "Description": "An unauthenticated attacker on the internet can reach the EC2 instance via SSH (open security group), execute code, assume the EC2 IAM role with s3:* permissions, and exfiltrate sensitive credentials from the publicly readable S3 bucket. This is a complete 5-hop attack chain from internet to credential exfiltration.",
+    "AffectedResources": [
+      "i-0abc123def456789",
+      "sg-0abc123",
+      "ec2-role",
+      "ict-lab-a3f2c1d4-data"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366503Z"
+  },
+  {
+    "FindingID": "ZC-ATK-002",
+    "Title": "Public S3 Bucket Direct Credential Exposure",
+    "Type": "AttackPath",
+    "Severity": "Critical",
+    "RiskScore": 9.5,
+    "PathDepth": 2,
+    "Nodes": [
+      {
+        "id": "internet",
+        "type": "ExternalActor",
+        "label": "Internet (anonymous)"
+      },
+      {
+        "id": "ict-lab-a3f2c1d4-data",
+        "type": "S3Bucket",
+        "label": "s3://ict-lab-a3f2c1d4-data (public-read ACL)"
+      },
+      {
+        "id": "credentials",
+        "type": "S3Object",
+        "label": "credentials/db_config.txt (DB_PASS + API_KEY)"
+      }
+    ],
+    "Edges": [
+      {
+        "from": "internet",
+        "to": "ict-lab-a3f2c1d4-data",
+        "label": "HTTP GET (no auth required \u2014 public ACL)"
+      },
+      {
+        "from": "ict-lab-a3f2c1d4-data",
+        "to": "credentials",
+        "label": "Object accessible without credentials"
+      }
+    ],
+    "Description": "Without any prior access, an attacker can directly download https://ict-lab-a3f2c1d4-data.s3.amazonaws.com/credentials/db_config.txt and obtain database credentials and API keys. No authentication required.",
+    "AffectedResources": [
+      "ict-lab-a3f2c1d4-data"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366517Z"
+  },
+  {
+    "FindingID": "ZC-ATK-003",
+    "Title": "No-MFA Admin Account Takeover Path",
+    "Type": "AttackPath",
+    "Severity": "Critical",
+    "RiskScore": 9.2,
+    "PathDepth": 3,
+    "Nodes": [
+      {
+        "id": "internet",
+        "type": "ExternalActor",
+        "label": "Attacker / Phishing"
+      },
+      {
+        "id": "admin-user",
+        "type": "IAMUser",
+        "label": "ict-lab-admin (AdministratorAccess, no MFA)"
+      },
+      {
+        "id": "all-aws",
+        "type": "AWSEnvironment",
+        "label": "Full AWS environment control"
+      }
+    ],
+    "Edges": [
+      {
+        "from": "internet",
+        "to": "admin-user",
+        "label": "credential phishing / brute-force (no MFA protection)"
+      },
+      {
+        "from": "admin-user",
+        "to": "all-aws",
+        "label": "AdministratorAccess policy \u2014 unrestricted"
+      }
+    ],
+    "Description": "The IAM user 'ict-lab-admin' has AdministratorAccess and no MFA. A phishing attack or credential leak gives the attacker full control over the entire AWS account \u2014 all services, all regions, all data.",
+    "AffectedResources": [
+      "ict-lab-a3f2c1d4-admin"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366525Z"
+  },
+  {
+    "FindingID": "ZC-ATK-004",
+    "Title": "SSRF via IMDSv1 to IAM Role Credential Theft",
+    "Type": "AttackPath",
+    "Severity": "High",
+    "RiskScore": 8.1,
+    "PathDepth": 4,
+    "Nodes": [
+      {
+        "id": "attacker",
+        "type": "ExternalActor",
+        "label": "Attacker exploiting SSRF vulnerability"
+      },
+      {
+        "id": "i-0abc123def456789",
+        "type": "EC2Instance",
+        "label": "EC2 54.74.123.45 (IMDSv1 enabled)"
+      },
+      {
+        "id": "imds",
+        "type": "MetadataService",
+        "label": "http://169.254.169.254/latest/meta-data/iam/security-credentials/"
+      },
+      {
+        "id": "ec2-role",
+        "type": "IAMRole",
+        "label": "ec2-role credentials (AccessKey + SecretKey + Token)"
+      },
+      {
+        "id": "ict-lab-a3f2c1d4-data",
+        "type": "S3Bucket",
+        "label": "s3://ict-lab-a3f2c1d4-data and all S3 buckets"
+      }
+    ],
+    "Edges": [
+      {
+        "from": "attacker",
+        "to": "i-0abc123def456789",
+        "label": "SSRF in web app triggers internal HTTP request"
+      },
+      {
+        "from": "i-0abc123def456789",
+        "to": "imds",
+        "label": "IMDSv1 \u2014 no token required"
+      },
+      {
+        "from": "imds",
+        "to": "ec2-role",
+        "label": "returns temporary AWS credentials"
+      },
+      {
+        "from": "ec2-role",
+        "to": "ict-lab-a3f2c1d4-data",
+        "label": "use stolen credentials for s3:* access"
+      }
+    ],
+    "Description": "If a web application running on the EC2 instance has an SSRF vulnerability, the attacker can query the IMDSv1 metadata endpoint (no session token required) and retrieve the ec2-role temporary credentials. These credentials grant s3:* access to all S3 buckets in the account.",
+    "AffectedResources": [
+      "i-0abc123def456789",
+      "ec2-role"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366540Z"
+  },
+  {
+    "FindingID": "ZC-FIND-005",
+    "Title": "CloudTrail Disabled \u2014 No Audit Trail",
+    "Type": "Finding",
+    "Severity": "High",
+    "RiskScore": 7.5,
+    "PathDepth": 1,
+    "Nodes": [
+      {
+        "id": "cloudtrail",
+        "type": "AWSService",
+        "label": "CloudTrail (not enabled)"
+      }
+    ],
+    "Edges": [],
+    "Description": "CloudTrail is not enabled. All attack paths described above would be executed with no audit log. The attacker's API calls, data access, and privilege escalation would leave no evidence for forensic investigation.",
+    "AffectedResources": [
+      "123456789012"
+    ],
+    "Timestamp": "2026-06-23T14:27:44.366547Z"
+  }
+]
